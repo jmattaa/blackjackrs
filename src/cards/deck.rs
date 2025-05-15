@@ -4,7 +4,7 @@ use rand::{rng, seq::SliceRandom};
 const DECK_SIZE: usize = 52;
 
 pub struct Deck {
-    pub cards: [u8; DECK_SIZE],
+    pub cards: Vec<u8>
 }
 
 impl Deck {
@@ -24,18 +24,13 @@ impl Deck {
     }
 }
 
-impl std::fmt::Display for Deck {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl ToString for Deck {
+    fn to_string(&self) -> String {
+        let mut res = String::new();
         for card in &self.cards {
-            let res = print_card(*card, f);
-            if res.is_err() {
-                return res;
-            }
-            let res = write!(f, "\n");
-            if res.is_err() {
-                return res;
-            }
+            res.push_str(&cart_to_str(*card));
+            res.push_str(" ");
         }
-        Ok(())
-    }
+        res
+    } 
 }

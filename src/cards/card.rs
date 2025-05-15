@@ -31,30 +31,31 @@ pub fn value(c: u8) -> u8 {
     c & 0b00001111
 }
 
-pub fn print_card(c: u8, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-    let s_str = match suit(c) {
-        CLUBS => "♣",
-        DIAMONDS => "♦",
-        HEARTS => "♥",
-        SPADES => "♠",
-        _ => "?",
-    };
-    let v_str = match value(c) {
-        ACE => "A",
-        TWO => "2",
-        THREE => "3",
-        FOUR => "4",
-        FIVE => "5",
-        SIX => "6",
-        SEVEN => "7",
-        EIGHT => "8",
-        NINE => "9",
-        TEN => "10",
-        JACK => "J",
-        QUEEN => "Q",
-        KING => "K",
-        _ => "?",
-    };
-
-    write!(f, "{}{}", v_str, s_str)
+pub fn cart_to_str(c: u8) -> String {
+    format!(
+        "{}{}",
+        match value(c) {
+            ACE => "A",
+            TWO => "2",
+            THREE => "3",
+            FOUR => "4",
+            FIVE => "5",
+            SIX => "6",
+            SEVEN => "7",
+            EIGHT => "8",
+            NINE => "9",
+            TEN => "10",
+            JACK => "J",
+            QUEEN => "Q",
+            KING => "K",
+            _ => "?",
+        },
+        match suit(c) {
+            CLUBS => "♣",
+            DIAMONDS => "♦",
+            HEARTS => "♥",
+            SPADES => "♠",
+            _ => "?",
+        },
+    )
 }
