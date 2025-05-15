@@ -1,17 +1,17 @@
 // first 4 bits are the value
-pub const ACE: u8 = 0b00000001;
-pub const TWO: u8 = 0b00000010;
-pub const THREE: u8 = 0b00000011;
-pub const FOUR: u8 = 0b00000100;
-pub const FIVE: u8 = 0b00000101;
-pub const SIX: u8 = 0b00000110;
-pub const SEVEN: u8 = 0b00000111;
-pub const EIGHT: u8 = 0b00001000;
-pub const NINE: u8 = 0b00001001;
-pub const TEN: u8 = 0b00001010;
-pub const JACK: u8 = 0b00001011;
-pub const QUEEN: u8 = 0b00001100;
-pub const KING: u8 = 0b00001101;
+pub const ACE: u8 = 1;
+pub const TWO: u8 = 2;
+pub const THREE: u8 = 3;
+pub const FOUR: u8 = 4;
+pub const FIVE: u8 = 5;
+pub const SIX: u8 = 6;
+pub const SEVEN: u8 = 7;
+pub const EIGHT: u8 = 8;
+pub const NINE: u8 = 9;
+pub const TEN: u8 = 10;
+pub const JACK: u8 = 11;
+pub const QUEEN: u8 = 12;
+pub const KING: u8 = 13;
 
 // last 3 bits are the suit
 pub const CLUBS: u8 = 0b00100000;
@@ -28,7 +28,9 @@ pub fn suit(c: u8) -> u8 {
     c & 0b11100000
 }
 pub fn value(c: u8) -> u8 {
-    c & 0b00001111
+    // highest value is 10
+    let v = c & 0b00001111;
+    if v > 10 { 10 } else { v }
 }
 
 pub fn cart_to_str(c: u8) -> String {
