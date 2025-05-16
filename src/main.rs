@@ -23,19 +23,30 @@ fn main() {
         terminal
             .draw(|f| draw(f, &dealer, &player, &deck, isplayerturn))
             .expect("failed to draw");
-        match event::read().expect("failed to read event") {
-            Event::Key(key) => match key.code {
-                KeyCode::Char('q') => break,
-                KeyCode::Char('h') => {
-                    if isplayerturn {
-                        player.hit(&mut deck, 1)
+
+        if isplayerturn {
+            match event::read().expect("failed to read event") {
+                Event::Key(key) => match key.code {
+                    KeyCode::Char('q') => break,
+                    KeyCode::Char('h') => {
+                        if isplayerturn {
+                            player.hit(&mut deck, 1)
+                        }
                     }
-                }
-                KeyCode::Char('s') => isplayerturn = false,
+                    KeyCode::Char('s') => isplayerturn = false,
+                    _ => (),
+                },
+                // other event types than key
                 _ => (),
-            },
-            // other event types than key
-            _ => (),
+            }
+        } else {
+            if dealer.count() < 17 {
+                dealer.hit(&mut deck, 1);
+                // sleep to not make it instant
+                std::thread::sleep(std::time::Duration::from_millis(500));
+            } else {
+                todo!("end current hand");
+            }
         }
     }
 
