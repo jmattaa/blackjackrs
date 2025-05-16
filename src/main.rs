@@ -9,22 +9,23 @@ use cards::hand;
 
 fn main() {
     let mut deck = deck::Deck::gen_deck();
-    let mut dealer = hand::Hand::new();
-    let mut player = hand::Hand::new();
+    let mut dealer = hand::Hand::new(&mut deck);
+    let mut player = hand::Hand::new(&mut deck);
 
     let mut isplayerturn = true;
-
-    // both start with one card
-    dealer.hit(&mut deck, 2);
-    player.hit(&mut deck, 2);
+    let mut playerbust = false;
 
     let mut terminal = ratatui::init();
     loop {
         terminal
-            .draw(|f| draw(f, &dealer, &player, &deck, isplayerturn))
+            .draw(|f| draw(f, &dealer, &player, isplayerturn, None))
             .expect("failed to draw");
 
-        if isplayerturn {
+        if player.count() > 21 {
+            playerbust = true;
+        }
+
+        if isplayerturn && !playerbust {
             match event::read().expect("failed to read event") {
                 Event::Key(key) => match key.code {
                     KeyCode::Char('q') => break,
@@ -40,12 +41,42 @@ fn main() {
                 _ => (),
             }
         } else {
-            if dealer.count() < 17 {
+            if dealer.count() < 17 && !playerbust {
                 dealer.hit(&mut deck, 1);
                 // sleep to not make it instant
                 std::thread::sleep(std::time::Duration::from_millis(500));
             } else {
-                todo!("end current hand");
+                let message = if playerbust {
+                    "You bust! You lose"
+                } else if dealer.count() > 21 {
+                    "Dealer bust! You win"
+                } else if player.count() > dealer.count() {
+                    "You win!"
+                } else if player.count() < dealer.count() {
+                    "You lose"
+                } else {
+                    "Draw"
+                };
+                terminal
+                    .draw(|f| draw(f, &dealer, &player, isplayerturn, Some(message)))
+                    .expect("failed to draw");
+
+                // this is blocking and waits for input before continuing
+                match event::read().expect("failed to read event") {
+                    Event::Key(key) => match key.code {
+                        KeyCode::Char('q') => break,
+                        KeyCode::Char('c') => {
+                            deck = deck::Deck::gen_deck();
+                            dealer = hand::Hand::new(&mut deck);
+                            player = hand::Hand::new(&mut deck);
+                            isplayerturn = true;
+                            playerbust = false;
+                        }
+                        _ => (),
+                    },
+                    // other event types than key
+                    _ => (),
+                }
             }
         }
     }
@@ -57,8 +88,8 @@ fn draw(
     f: &mut Frame,
     dealer: &hand::Hand,
     player: &hand::Hand,
-    _deck: &deck::Deck,
     isplayerturn: bool,
+    msg: Option<&str>,
 ) {
     let chunks = Layout::default()
         .direction(Direction::Vertical)
@@ -75,14 +106,22 @@ fn draw(
         Paragraph::new("press 'q' to quit").block(Block::default()),
         chunks[0],
     );
-    if isplayerturn {
-        f.render_widget(
-            Paragraph::new("press 'h' to hit and 's' to stand").block(Block::default()),
-            chunks[1],
-        );
+    if msg.is_none() {
+        if isplayerturn {
+            f.render_widget(
+                Paragraph::new("press 'h' to hit and 's' to stand").block(Block::default()),
+                chunks[1],
+            );
+        } else {
+            f.render_widget(
+                Paragraph::new("Delers turn...").block(Block::default()),
+                chunks[1],
+            );
+        }
     } else {
         f.render_widget(
-            Paragraph::new("Dealer's turn...").block(Block::default()),
+            Paragraph::new(format!("{} Press 'c' to continue playing", msg.unwrap()))
+                .block(Block::default()).alignment(Alignment::Center),
             chunks[1],
         );
     }

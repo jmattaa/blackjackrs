@@ -6,8 +6,11 @@ pub struct Hand {
 }
 
 impl Hand {
-    pub fn new() -> Hand {
-        Hand { cards: Vec::new() }
+    pub fn new(deck: &mut deck::Deck) -> Hand {
+        let mut hand = Hand { cards: Vec::new() };
+        // a hand starts with 2 cards
+        hand.hit(deck, 2);
+        hand
     }
 
     // hits t amount of cards
