@@ -44,6 +44,22 @@ impl Hand {
 
         res
     }
+
+    pub fn dealercount(&self, isplayerturn: bool) -> u8 {
+        if isplayerturn {
+            value(self.cards[0])
+        } else {
+            self.count()
+        }
+    }
+
+    pub fn dealerstr(&self, isplayerturn: bool) -> String {
+        if isplayerturn {
+            format!("{} ??", cart_to_str(self.cards[0]))
+        } else {
+            self.to_string()
+        }
+    }
 }
 
 impl ToString for Hand {

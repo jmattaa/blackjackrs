@@ -44,7 +44,7 @@ fn main() {
             if dealer.count() < 17 && !playerbust {
                 dealer.hit(&mut deck, 1);
                 // sleep to not make it instant
-                std::thread::sleep(std::time::Duration::from_millis(500));
+                std::thread::sleep(std::time::Duration::from_millis(750));
             } else {
                 let message = if playerbust {
                     "You bust! You lose"
@@ -121,7 +121,8 @@ fn draw(
     } else {
         f.render_widget(
             Paragraph::new(format!("{} Press 'c' to continue playing", msg.unwrap()))
-                .block(Block::default()).alignment(Alignment::Center),
+                .block(Block::default())
+                .alignment(Alignment::Center),
             chunks[1],
         );
     }
@@ -129,8 +130,8 @@ fn draw(
     f.render_widget(
         Paragraph::new(format!(
             "Dealer: {} total: {}",
-            dealer.to_string(),
-            dealer.count()
+            dealer.dealerstr(isplayerturn),
+            dealer.dealercount(isplayerturn)
         ))
         .block(Block::default())
         .alignment(Alignment::Center),
